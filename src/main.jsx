@@ -1,48 +1,79 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import { Provider } from 'react-redux'
-import { store } from './redux-toolkit/store.js'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import CreateCategoriesPage from './pages/categories/createCategories.jsx'
-import CategoriesPage from './pages/categories/categories.jsx'
-import ProductsPage from './pages/products/products.jsx'
-import CreateProductsPage from './pages/products/createProducts.jsx'
-import LoginPage from './pages/auth/login.jsx'
-import OrdersPage from './pages/orders/orders.jsx'
-
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import { Provider } from "react-redux";
+import { store } from "./redux-toolkit/store.js";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import CreateCategoriesPage from "./pages/categories/createCategories.jsx";
+import CategoriesPage from "./pages/categories/categories.jsx";
+import ProductsPage from "./pages/products/products.jsx";
+import CreateProductsPage from "./pages/products/createProducts.jsx";
+import LoginPage from "./pages/auth/login.jsx";
+import OrdersPage from "./pages/orders/orders.jsx";
+import AuthProvider from "react-auth-kit/AuthProvider";
+import createStore from "react-auth-kit/createStore";
+import RequireAuth from "@auth-kit/react-router/RequireAuth";
 
 const router = createBrowserRouter([
   {
-    path: '/products',
-    element: <ProductsPage />
+    path: "/products",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <ProductsPage />
+      </RequireAuth>
+    ),
   },
   {
-    path: '/create-products',
-    element: <CreateProductsPage />
+    path: "/create-products",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <CreateProductsPage />
+      </RequireAuth>
+    ),
   },
   {
-    path: '/categories',
-    element: <CategoriesPage />
+    path: "/categories",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <CategoriesPage />
+      </RequireAuth>
+    ),
   },
   {
-    path: '/create-categories',
-    element: <CreateCategoriesPage />
+    path: "/create-categories",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <CreateCategoriesPage />
+      </RequireAuth>
+    ),
   },
   {
-    path: '/',
-    element: <LoginPage />
+    path: "/",
+    element: <LoginPage />,
   },
   {
-    path: '/orders',
-    element: <OrdersPage />
-  }
-])
+    path: "/orders",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <OrdersPage />
+      </RequireAuth>
+    ),
+  },
+]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const auth_store = createStore({
+  authName: "_auth",
+  authType: "cookie",
+  cookieDomain: window.location.hostname,
+  cookieSecure: false,
+});
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
-       <RouterProvider router={router}/>
+      <AuthProvider store={auth_store}>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </Provider>
   </React.StrictMode>,
-)
+);
