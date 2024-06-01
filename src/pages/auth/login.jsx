@@ -7,6 +7,7 @@ import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const { login, code, setCode } = useAuthApi();
   const isAuthenticated = useIsAuthenticated();
@@ -23,6 +24,8 @@ const LoginPage = () => {
     if (code === 200) {
       navigate("/products");
       setCode(null);
+    } else if (code === 401) {
+      setError("Unauthorized");
     }
   }, [code]);
 
@@ -37,14 +40,15 @@ const LoginPage = () => {
           placeholder="Email Address"
           onChange={(e) => setEmail(e.target.value)}
           value={email}
-        ></input>
+        />
         <input
           className="border-[2px] border-gray-300 p-[8px] rounded-[20px] w-[80%]"
           placeholder="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
-        ></input>
+        />
+        {error && <div className="text-red-500">{error}</div>}
         <Button
           type={"button"}
           text={"Login"}
