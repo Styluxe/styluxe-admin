@@ -13,6 +13,7 @@ import {
 } from "../../mocks/dummyProducts";
 import { useSelector } from "react-redux";
 import { selectedProductState } from "../../redux-toolkit/product/productSlice";
+import { TrashIcon } from "@heroicons/react/16/solid";
 
 const CreateProductsPage = () => {
   const selectedProductData = useSelector(selectedProductState);
@@ -48,6 +49,8 @@ const CreateProductsPage = () => {
   const [imageTableObject, setImageTableObject] = useState(
     selectedProductData.product_images ?? [],
   );
+
+  console.log('imageTa', imageTableObject);
 
   const isValidToCreate = (product) => {
     if (
@@ -92,9 +95,15 @@ const CreateProductsPage = () => {
   };
 
   const renderImageData = useMemo(() => {
-    return imageTable.map((data) => {
+    return imageTableObject.map((data) => {
       return {
         ...data,
+        image_url:(
+          <img
+            src={URL.createObjectURL(data.image)}
+            className="w-[100px] h-[100px] object-cover"
+          />
+        ),
         action: (
           <img
             src="trash_icon.svg"
@@ -106,7 +115,7 @@ const CreateProductsPage = () => {
         ),
       };
     });
-  }, [imageTable]);
+  }, [imageTableObject]);
 
   const renderSizeTable = useMemo(() => {
     return sizeTable.map((data) => {
@@ -115,7 +124,7 @@ const CreateProductsPage = () => {
         action: (
           <img
             src="trash_icon.svg"
-            className="bg-[#d9c075] p-[3px] rounded-md cursor-pointer"
+            className="bg-primary p-[3px] rounded-md cursor-pointer"
             onClick={() =>
               setSizeTable(sizeTable.filter((item) => item.id !== data.id))
             }
@@ -206,7 +215,7 @@ const CreateProductsPage = () => {
               text={"Add"}
               classname={`${
                 size && stock
-                  ? "bg-[#91680f]"
+                  ? "bg-primary"
                   : "bg-gray-400 pointer-events-none"
               } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
               icon
@@ -243,7 +252,7 @@ const CreateProductsPage = () => {
             <Button
               text={"Add"}
               classname={`${
-                image ? "bg-[#91680f]" : "bg-gray-400 pointer-events-none"
+                image ? "bg-primary" : "bg-gray-400 pointer-events-none"
               } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
               icon
               iconSrc={"plus_icon.svg"}
@@ -473,7 +482,7 @@ const CreateProductsPage = () => {
               isValidToCreate(product) &&
               sizeTable.length > 0 &&
               imageTable.length > 0
-                ? "bg-[#91680f]"
+                ? "bg-primary"
                 : "bg-gray-400 pointer-events-none"
             } py-[5px] px-[10px] rounded-[5px] text-white text-[18px] mt-[15px] w-fit ml-auto`}
             onClick={() => {

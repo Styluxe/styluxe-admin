@@ -3,32 +3,31 @@ import { useState } from "react";
 import { PATH_URL } from "./constan";
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 
-const useCategoryApi = () => {
+const useGetOrderApi = () => {
+  const [orders, setOrders] = useState([]);
   const [code, setCode] = useState(null);
-  const [categories, setCategories] = useState([]);
   const header = useAuthHeader();
-
-  const getCategories = async () => {
+  const getOrder = async () => {
     try {
-      const response = await axios.get(`${PATH_URL}/categories`, {
+      const response = await axios.get(`${PATH_URL}/orders`, {
         headers: {
           Authorization: header,
         },
       });
-      const { data, code } = response.data;
-      setCategories(data);
+      const { data: orders, code } = response.data;
+      setOrders(orders);
       setCode(code);
-      console.log("fetching category");
+      console.log("fetching order");
     } catch (error) {
       console.log(error);
     }
   };
   return {
-    getCategories,
-    categories,
+    getOrder,
+    orders,
     code,
     setCode,
   };
 };
 
-export { useCategoryApi };
+export { useGetOrderApi };

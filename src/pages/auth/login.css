@@ -1,3 +1,10 @@
 .loginHeader {
-    background-image: linear-gradient(to right, #613e07, #79520b, #91680f, #a97e14, #c09618);
+  background-image: linear-gradient(
+    to right,
+    #613e07,
+    #79520b,
+    #97704f,
+    #a97e14,
+    #c09618
+  );
 }

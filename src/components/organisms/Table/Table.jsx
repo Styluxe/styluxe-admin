@@ -6,7 +6,7 @@ const Table = ({ headings, data, classname }) => {
           {headings.map((heading, index) => (
             <td
               key={index}
-              className={`border-[1px] border-black p-2 font-semibold bg-[#d9c075]`}
+              className={`border-[1px] border-black p-2 font-semibold bg-secondary`}
               style={{ width: `${heading.width}` }}
             >
               {heading.label}

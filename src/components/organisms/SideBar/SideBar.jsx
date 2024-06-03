@@ -1,4 +1,4 @@
-import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/16/solid";
+import { ArrowLeftStartOnRectangleIcon, ChevronDoubleLeftIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
 import { useNavigate } from "react-router-dom";
@@ -27,21 +27,23 @@ const SideBar = () => {
     <div
       className={`${
         open ? "w-[200px]" : "w-[45px]"
-      } h-full bg-[#91680f] relative duration-300 pt-[15px] p-[8px]`}
+      } h-full bg-primary relative duration-300 pt-[15px] p-[8px]`}
     >
-      <div className="flex absolute cursor-pointer right-[-10px] top-10 border-2 border-black rounded-full bg-white justify-center items-center p-[2px]">
-        <img
-          src="left_arrow.svg"
-          alt=""
-          className={`w-[18px] h-[18px] ${open ? "rotate-0" : "rotate-180"}`}
+      <div className="flex absolute bg cursor-pointer right-[-10px] top-10 border border-gray-500 rounded-full bg-white justify-center items-center p-[2px]">
+        <ChevronDoubleLeftIcon
+          className={`w-[24px] h-[24px] ${open ? "rotate-0" : "rotate-180"}`}
           onClick={() => setOpen(!open)}
         />
       </div>
       <div className="flex flex-col gap-[30px] h-full">
-        <div className="flex gap-[10px]">
-          <img src="/icon/icon.png" alt="" className={"w-[25px] h-[25px]"} />
-          <p className={`text-white duration-200 ${!open && "scale-0"}`}>
-            Styluxe
+        <div className="flex gap-[10px] items-center">
+          <img src="/ic_launcher.png" alt="" className={"w-[30px] h-[30px]"} />
+          <p
+            className={`text-white font-semibold duration-200 ${
+              !open && "scale-0"
+            }`}
+          >
+            Styluxe Admin
           </p>
         </div>
         <div className="  h-full">
@@ -50,13 +52,11 @@ const SideBar = () => {
               key={index}
               className={`text-gray-300 text-sm flex items-center gap-x-[7px] cursor-pointer ${
                 open ? "p-[10px] !pl-[2px]" : "pl-[2px]"
-              } py-[10px] hover:bg-[#efcc62] rounded-sm`}
+              } py-[10px] hover:bg-secondary rounded-sm`}
+              onClick={() => navigate(`/${menu.label.toLowerCase()}`)}
             >
               <img src={menu.src} alt="" className="!w-[18px] !h-[18px]" />
-              <a
-                className={`text-white duration-200 ${!open && "scale-0"}`}
-                href={`/${menu.label.toLowerCase()}`}
-              >
+              <a className={`text-white duration-200 ${!open && "scale-0"}`}>
                 {menu.label}
               </a>
             </div>

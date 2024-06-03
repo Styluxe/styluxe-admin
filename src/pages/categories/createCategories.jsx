@@ -33,7 +33,7 @@ const CreateCategoriesPage = () => {
         action: (
           <img
             src="trash_icon.svg"
-            className="bg-[#d9c075] p-[3px] rounded-md cursor-pointer"
+            className="bg-primary p-[3px] rounded-md cursor-pointer"
             onClick={() =>
               setSubCategoryTable(
                 subCategoryTable.filter((item) => item.id !== data.id),
@@ -106,7 +106,7 @@ const CreateCategoriesPage = () => {
               text={"Add"}
               classname={`${
                 subCategoryName && subCategoryImg
-                  ? "bg-[#91680f]"
+                  ? "bg-primary"
                   : "bg-gray-400 pointer-events-none"
               } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
               icon
@@ -140,7 +140,7 @@ const CreateCategoriesPage = () => {
               <Button
                 text={"Save"}
                 classname={
-                  "bg-[#91680f] py-[5px] px-[10px] rounded-[5px] text-white mt-[15px] w-fit ml-auto"
+                  "bg-primary py-[5px] px-[10px] rounded-[5px] text-white mt-[15px] w-fit ml-auto"
                 }
                 onClick={() => {
                   const Category = {

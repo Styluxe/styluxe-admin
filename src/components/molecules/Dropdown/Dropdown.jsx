@@ -35,12 +35,12 @@ const Dropdown = ({
       <div
         className={`transition-all duration-300 ${
           open ? "max-h-[200px] overflow-y-auto" : "max-h-0 overflow-hidden"
-        } absolute top-[110%] w-full`}
+        } absolute top-[110%] w-full shadow-[0_3px_10px_rgb(0,0,0,0.2)]`}
       >
         {menu.map((item, index) => (
           <div
             key={index}
-            className="text-black text-[14px] cursor-pointer hover:bg-[#b99b42] p-[5px] bg-[#d9c075]"
+            className="text-black text-[14px] cursor-pointer hover:bg-secondary p-[5px] bg-gray-200"
             onClick={() => {
               setOpen(false);
               setSelected(item.label);

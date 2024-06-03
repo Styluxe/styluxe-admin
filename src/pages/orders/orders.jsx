@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { InputSearch } from "../../components/molecules/InputSearch";
 import { Navbar } from "../../components/molecules/NavBar";
 import { SideBar } from "../../components/organisms/SideBar";
@@ -8,47 +8,64 @@ import { Table } from "../../components/organisms/Table";
 import { Modal } from "../../components/molecules/Modal";
 import { dummyOrdersBody, ordersHeading } from "../../mocks/dummyOrders";
 import { Badge } from "../../components/atoms/Badge";
+import { useGetOrderApi } from "../../API/OrderAPI";
 
 const OrdersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tableData, setTableData] = useState(dummyOrdersBody);
+  const [tableData, setTableData] = useState([]);
   const [modalType, setModalType] = useState(null);
 
+  const { getOrder, orders } = useGetOrderApi();
+
+  useEffect(() => {
+    getOrder();
+  }, []);
+
   const renderButtonLabel = (status) => {
-    if (status === "Waiting For Confirmation") {
+    if (status === "waiting for confirmation") {
       return "Move into Processing";
-    } else if (status === "Processing") {
+    } else if (status === "processing") {
       return "Move into On Delivery";
-    } else if (status === "On Delivery") {
+    } else if (status === "shipped") {
       return "Move into Delivered";
     }
   };
 
   const renderTableData = useMemo(() => {
-    return tableData.map((data) => {
+    return orders?.map((data) => {
       return {
         ...data,
-        products: data.products
-          .map((product) => `${product.product_name}(${product.quantity})`)
-          .join(", "),
+        products: (
+          <ul style={{ listStyleType: 'disc', marginLeft: '20px' }}>
+            {data.order_items?.map((data, index) => (
+              <li className="text-[13px]" key={index}>{data?.product.product_name + " (" + data?.quantity + ")"}</li>
+            ))}
+          </ul>
+        ),
+
+        customer_name: data?.user?.first_name + " " + data?.user?.last_name,
         order_status: (
           <div className="flex">
             <Badge label={data.order_status} />
-            {data.order_status != "Pending" &&
-              data.order_status != "Delivered" && (
+            {data.order_status != "pending" &&
+              data.order_status != "delivered" &&
+              data.order_status != "cancelled" && (
                 <Button
-                  text={renderButtonLabel(data.order_status)}
+                  text={renderButtonLabel(data?.order_status)}
                   classname={
-                    "bg-[#91680f] py-[3px] px-[10px] rounded-[5px] text-white w-fit ml-auto text-[13px]"
+                    "bg-primary py-[3px] px-[10px] rounded-[5px] text-white w-fit ml-auto text-[13px]"
                   }
                   onClick={() => setModalType("change_status")}
                 />
               )}
           </div>
         ),
+        total:(
+          <p className="text-[13px]">Rp {parseFloat(data?.total).toLocaleString('id-ID')}</p>
+        )
       };
     });
-  }, [tableData]);
+  }, [orders]);
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -63,7 +80,7 @@ const OrdersPage = () => {
   };
 
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+  const totalPages = Math.ceil(renderTableData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = renderTableData.slice(indexOfFirstItem, indexOfLastItem);
@@ -82,7 +99,7 @@ const OrdersPage = () => {
               placeholder={"Order ID"}
               onSearch={handleSearch}
               inputClassName={
-                "rounded-[3px] border-[1px] border-black px-[15px] outline-none w-[400px] py-[3px]"
+                "rounded-[3px] border-[1px] border-gray-300 px-[15px] outline-none w-[400px] py-[3px]"
               }
             />
           </div>
@@ -115,13 +132,13 @@ const OrdersPage = () => {
             <Button
               text={"Yes"}
               classname={
-                "bg-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
               }
             />
             <Button
               text={"No"}
               classname={
-                "bg-white border-2 border-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-[#91680f]"
+                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-primary"
               }
               onClick={() => setModalType(null)}
             />

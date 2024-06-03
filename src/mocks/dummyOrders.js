@@ -1,6 +1,6 @@
 export const ordersHeading = [
     {
-        id: 'order_id',
+        id: 'order_number',
         label : 'Order ID',
         width: '8%'
       },

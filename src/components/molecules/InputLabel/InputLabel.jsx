@@ -20,7 +20,7 @@ const InputLabel = ({
         {label}
       </label>
       {type === "textarea" ? (
-        <parea
+        <textarea
           className={`placeholder:text-muted ${inputClassName}`}
           name={name}
           placeholder={placeholder ? placeholder : ""}

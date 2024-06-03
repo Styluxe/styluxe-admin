@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { setSelectedCategory } from "../../redux-toolkit/product/productSlice";
 import { Modal } from "../../components/molecules/Modal";
 import { useCategoryApi } from "../../API/CategoryAPi";
+import { PencilSquareIcon, TrashIcon  } from "@heroicons/react/16/solid";
 
 const CategoriesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,20 +37,18 @@ const CategoriesPage = () => {
           .map((subCategory) => subCategory.sub_category_name)
           .join(", "),
         actions: (
-          <div className="flex items-center gap-x-[20px]">
-            <img
-              src="pencil_icon.svg"
-              className="bg-[#d9c075] p-[3px] rounded-md  cursor-pointer"
+          <div className="flex items-center gap-x-[20px] justify-center">
+            <PencilSquareIcon
+              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
               onClick={() => {
                 dispatch(setSelectedCategory(data));
                 navigate("/create-categories");
               }}
-            ></img>
-            <img
-              src="trash_icon.svg"
-              className="bg-[#d9c075] p-[3px] rounded-md  cursor-pointer"
+            />
+            <TrashIcon
+              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
               onClick={() => setModalType("delete_category")}
-            ></img>
+            />
           </div>
         ),
       };
@@ -69,7 +68,7 @@ const CategoriesPage = () => {
   };
 
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+  const totalPages = Math.ceil(renderTableData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = renderTableData.slice(indexOfFirstItem, indexOfLastItem);
@@ -88,7 +87,7 @@ const CategoriesPage = () => {
               placeholder={"Category Name"}
               onSearch={handleSearch}
               inputClassName={
-                "rounded-[3px] border-[1px] border-black px-[15px] outline-none w-[400px] py-[3px]"
+                "rounded-[3px] border-[1px] border-gray-300 px-[15px] outline-none w-[400px] py-[3px]"
               }
             />
           </div>

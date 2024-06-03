@@ -30,19 +30,20 @@ const LoginPage = () => {
   }, [code]);
 
   return (
-    <div className="flex justify-center items-center h-screen bg-slate-200">
+    <div className="flex flex-col justify-center items-center h-screen bg-gray-300 gap-[30px]">
+      <img src="/icon/logo_nob.png" alt="logo" className="w-[150px] h-[150px]" />
       <div className="w-[350px] h-fit bg-white rounded-[10px] drop-shadow-lg flex flex-col gap-y-[25px] items-center pb-[40px]">
-        <div className="loginHeader text-white text-center text-[25px] py-[10px] rounded-t-[10px] font-semibold w-full">
-          Login Form
+        <div className="bg-primary text-white text-center text-[25px] py-[10px] rounded-t-[10px] font-semibold w-full">
+          Styluxe Admin Login
         </div>
         <input
-          className="border-[2px] border-gray-300 p-[8px] rounded-[20px] w-[80%]"
+          className="border-[2px] border-gray-300 p-[8px] rounded-[10px] w-[80%]"
           placeholder="Email Address"
           onChange={(e) => setEmail(e.target.value)}
           value={email}
         />
         <input
-          className="border-[2px] border-gray-300 p-[8px] rounded-[20px] w-[80%]"
+          className="border-[2px] border-gray-300 p-[8px] rounded-[10px] w-[80%]"
           placeholder="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
@@ -53,7 +54,7 @@ const LoginPage = () => {
           type={"button"}
           text={"Login"}
           classname={
-            "loginHeader p-[8px] text-white w-[80%] rounded-[20px] font-semibold"
+            "bg-primary p-[8px] text-white w-[80%] rounded-[10px] font-semibold"
           }
           onClick={() => login(email, password)}
         />

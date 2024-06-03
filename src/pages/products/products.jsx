@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { InputSearch } from "../../components/molecules/InputSearch";
 import { Navbar } from "../../components/molecules/NavBar";
 import { SideBar } from "../../components/organisms/SideBar";
@@ -12,6 +12,8 @@ import { setSelectedProduct } from "../../redux-toolkit/product/productSlice";
 import { Modal } from "../../components/molecules/Modal";
 
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
+import { useGetProductApi } from "../../API/ProductAPI";
+import { PencilIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,36 +22,52 @@ const ProductsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { getProduct, products } = useGetProductApi();
+
+  console.log(products);
+
+  useEffect(() => {
+    getProduct();
+  }, []);
+
   const renderTableData = useMemo(() => {
-    return tableData.map((data) => {
+    return products?.map((data) => {
       return {
         ...data,
         sizes: data.sizes
-          .map((size) => `${size.size}(${size.stock})`)
+          ?.map((size) => `${size.size}(${size.stock})`)
           .join(", "),
-        product_images: data.product_images
-          .map((image) => image.image_url)
-          .join(", "),
+        product_images: (
+          <div style={{ display: "flex", gap: "10px" }}>
+            {data.images?.map((image, index) => (
+              <img
+                key={index}
+                src={image.image_url}
+                className="w-[50px] h-[50px] object-cover"
+              />
+            ))}
+          </div>
+        ),
+        product_sub_category: data.sub_category?.sub_category_name,
+        price: "Rp " + parseFloat(data?.product_price).toLocaleString("id-ID"),
         actions: (
-          <div className="flex items-center gap-x-[20px]">
-            <img
-              src="pencil_icon.svg"
-              className="bg-[#d9c075] p-[3px] rounded-md  cursor-pointer"
-              onClick={() => {
-                dispatch(setSelectedProduct(data));
-                navigate("/create-products");
-              }}
-            ></img>
-            <img
-              src="trash_icon.svg"
-              className="bg-[#d9c075] p-[3px] rounded-md  cursor-pointer"
-              onClick={() => setModalType("delete_product")}
-            ></img>
+          <div className="flex items-center gap-[15px] justify-center">
+            <PencilSquareIcon 
+            className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
+            onClick={() => {
+              dispatch(setSelectedProduct(data));
+              navigate("/create-products");
+            }}
+            />
+            <TrashIcon 
+            className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
+            onClick={() => setModalType("delete_product")}
+            />
           </div>
         ),
       };
     });
-  }, [tableData, dispatch, navigate]);
+  }, [products, dispatch, navigate]);
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -64,10 +82,13 @@ const ProductsPage = () => {
   };
 
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(tableData.length / itemsPerPage);
+  const totalPages = Math.ceil(renderTableData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = renderTableData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = renderTableData?.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   return (
     <div className="flex">
@@ -83,7 +104,7 @@ const ProductsPage = () => {
               placeholder={"Product Name"}
               onSearch={handleSearch}
               inputClassName={
-                "rounded-[3px] border-[1px] border-black px-[15px] outline-none w-[400px] py-[3px]"
+                "rounded-[3px] border-[1px] border-gray-300 px-[15px] outline-none w-[400px] py-[3px]"
               }
             />
           </div>
@@ -91,7 +112,7 @@ const ProductsPage = () => {
             <Button
               text={"Add New Product"}
               classname={
-                "bg-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit"
               }
               icon
               iconSrc={"plus_icon.svg"}
@@ -128,13 +149,13 @@ const ProductsPage = () => {
             <Button
               text={"Yes"}
               classname={
-                "bg-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
               }
             />
             <Button
               text={"No"}
               classname={
-                "bg-white border-2 border-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-[#91680f]"
+                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-primary"
               }
               onClick={() => setModalType(null)}
             />
