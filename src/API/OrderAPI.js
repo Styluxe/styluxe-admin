@@ -9,7 +9,7 @@ const useGetOrderApi = () => {
   const header = useAuthHeader();
   const getOrder = async () => {
     try {
-      const response = await axios.get(`${PATH_URL}/orders`, {
+      const response = await axios.get(`${PATH_URL}/admin/orders`, {
         headers: {
           Authorization: header,
         },

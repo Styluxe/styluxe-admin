@@ -9,7 +9,7 @@ const useGetProductApi = () => {
   const header = useAuthHeader();
   const getProduct = async () => {
     try {
-      const response = await axios.get(`${PATH_URL}/products`, {
+      const response = await axios.get(`${PATH_URL}/admin/products`, {
         headers: {
           Authorization: header,
         },

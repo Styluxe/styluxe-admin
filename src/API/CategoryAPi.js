@@ -10,7 +10,7 @@ const useCategoryApi = () => {
 
   const getCategories = async () => {
     try {
-      const response = await axios.get(`${PATH_URL}/categories`, {
+      const response = await axios.get(`${PATH_URL}/admin/categories`, {
         headers: {
           Authorization: header,
         },

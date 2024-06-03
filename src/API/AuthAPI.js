@@ -10,7 +10,7 @@ const useAuthApi = () => {
   const login = async (email, password) => {
     console.log(email, password);
     try {
-      const response = await axios.post(`${PATH_URL}/auth/login`, {
+      const response = await axios.post(`${PATH_URL}/admin/login`, {
         email,
         password,
       });

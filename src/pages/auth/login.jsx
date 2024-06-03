@@ -30,8 +30,12 @@ const LoginPage = () => {
   }, [code]);
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-300 gap-[30px]">
-      <img src="/icon/logo_nob.png" alt="logo" className="w-[150px] h-[150px]" />
+    <div className="flex flex-col justify-center items-center h-screen gap-[30px] login_bg">
+      <img
+        src="/icon/logo_nob.png"
+        alt="logo"
+        className="w-[150px] h-[150px]"
+      />
       <div className="w-[350px] h-fit bg-white rounded-[10px] drop-shadow-lg flex flex-col gap-y-[25px] items-center pb-[40px]">
         <div className="bg-primary text-white text-center text-[25px] py-[10px] rounded-t-[10px] font-semibold w-full">
           Styluxe Admin Login

@@ -8,3 +8,8 @@
     #c09618
   );
 }
+
+.login_bg {
+  background-color: #e2c9be;
+  background-image: linear-gradient(315deg, #e2c9be 0%, #fbf7e9 74%);
+}
