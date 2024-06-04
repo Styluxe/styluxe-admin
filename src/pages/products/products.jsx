@@ -13,7 +13,11 @@ import { Modal } from "../../components/molecules/Modal";
 
 import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
 import { useGetProductApi } from "../../API/ProductAPI";
-import { PencilIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
+import {
+  PencilIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/16/solid";
 
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,16 +56,16 @@ const ProductsPage = () => {
         price: "Rp " + parseFloat(data?.product_price).toLocaleString("id-ID"),
         actions: (
           <div className="flex items-center gap-[15px] justify-center">
-            <PencilSquareIcon 
-            className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
-            onClick={() => {
-              dispatch(setSelectedProduct(data));
-              navigate("/create-products");
-            }}
+            <PencilSquareIcon
+              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
+              onClick={() => {
+                dispatch(setSelectedProduct(data));
+                navigate("/create-products");
+              }}
             />
-            <TrashIcon 
-            className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
-            onClick={() => setModalType("delete_product")}
+            <TrashIcon
+              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
+              onClick={() => setModalType("delete_product")}
             />
           </div>
         ),
@@ -91,13 +95,13 @@ const ProductsPage = () => {
   );
 
   return (
-    <div className="flex">
-      <div className="h-screen">
+    <div className="flex h-screen flex-1 w-full ">
+      <div className="h-full">
         <SideBar />
       </div>
-      <div className="flex-1 h-screen">
+      <div className="h-screen overflow-hidden w-full flex-1">
         <Navbar title={"Manage Product"} userLoginName={"Bryan Hanuga"} />
-        <div className="flex flex-col p-[20px] overflow-y-auto">
+        <div className="flex flex-col p-[20px] overflow-y-auto h-full">
           <div className="flex flex-col gap-y-[10px] border-b-[1px] border-slate-500 pb-[30px]">
             <p className="text-[15px] font-semibold">Search Product</p>
             <InputSearch

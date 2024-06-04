@@ -40,6 +40,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/categories/edit/:id",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <CreateCategoriesPage />
+      </RequireAuth>
+    ),
+  },
+  {
     path: "/create-categories",
     element: (
       <RequireAuth fallbackPath="/">

@@ -2,7 +2,7 @@ import { InputLabel } from "../../components/molecules/InputLabel";
 import { Navbar } from "../../components/molecules/NavBar";
 import { SideBar } from "../../components/organisms/SideBar";
 import { Button } from "../../components/atoms/Button";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Table } from "../../components/organisms/Table";
 import { dummySubCategoryDropdown } from "../../mocks/dummyCategories";
 import { Dropdown } from "../../components/molecules/Dropdown";
@@ -13,10 +13,15 @@ import {
 } from "../../mocks/dummyProducts";
 import { useSelector } from "react-redux";
 import { selectedProductState } from "../../redux-toolkit/product/productSlice";
-import { TrashIcon } from "@heroicons/react/16/solid";
+import { useGetAllSubCategory } from "../../API/CategoryAPi";
 
 const CreateProductsPage = () => {
   const selectedProductData = useSelector(selectedProductState);
+  const { getAllSubCategory, subCategories } = useGetAllSubCategory();
+
+  useEffect(() => {
+    getAllSubCategory();
+  }, []);
 
   const [product, setProduct] = useState({
     product_name: selectedProductData.product_name ?? "",
@@ -50,7 +55,15 @@ const CreateProductsPage = () => {
     selectedProductData.product_images ?? [],
   );
 
-  console.log('imageTa', imageTableObject);
+  const dropdownData = useMemo(() => {
+    return subCategories.map((data) => {
+      return {
+        id: data.product_sub_category_id,
+        label: data.sub_category_name,
+        value: data.product_sub_category_id,
+      };
+    });
+  }, [subCategories]);
 
   const isValidToCreate = (product) => {
     if (
@@ -98,7 +111,7 @@ const CreateProductsPage = () => {
     return imageTableObject.map((data) => {
       return {
         ...data,
-        image_url:(
+        image_url: (
           <img
             src={URL.createObjectURL(data.image)}
             className="w-[100px] h-[100px] object-cover"
@@ -178,7 +191,7 @@ const CreateProductsPage = () => {
             labelText={"Product Sub Category"}
             withLabel={true}
             placeholder={"Choose Sub Category"}
-            menu={dummySubCategoryDropdown}
+            menu={dropdownData}
             classname={"w-[20%]"}
             onClickMenu={(e) =>
               setProduct({ ...product, product_sub_category: e })
@@ -214,9 +227,7 @@ const CreateProductsPage = () => {
             <Button
               text={"Add"}
               classname={`${
-                size && stock
-                  ? "bg-primary"
-                  : "bg-gray-400 pointer-events-none"
+                size && stock ? "bg-primary" : "bg-gray-400 pointer-events-none"
               } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
               icon
               iconSrc={"plus_icon.svg"}
@@ -462,20 +473,25 @@ const CreateProductsPage = () => {
             />
           </div>
           <div className="h-[1px] border-b-[1px] border-gray-400 " />
-          <InputLabel
-            inputClassName={
-              "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
-            }
-            label={"Price"}
-            name={"price"}
-            placeholder={"Input Product Price"}
-            labelPosition="top"
-            classname={"w-[15%]"}
-            onChange={(e) =>
-              setProduct({ ...product, product_price: e.target.value })
-            }
-            value={product.product_price}
-          />
+          <div className="flex flex-row items-end gap-1">
+            <p className="font-bold">Rp. </p>
+            <InputLabel
+              inputClassName={
+                "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
+              }
+              label={"Price"}
+              name={"price"}
+              type={"text"}
+              placeholder={"Input Product Price"}
+              labelPosition="top"
+              classname={"w-[15%]"}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, "");
+                setProduct({ ...product, product_price: value });
+              }}
+              value={product.product_price}
+            />
+          </div>
           <Button
             text={"Save"}
             classname={`${

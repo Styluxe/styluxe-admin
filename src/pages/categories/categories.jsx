@@ -11,10 +11,9 @@ import {
 } from "../../mocks/dummyCategories";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setSelectedCategory } from "../../redux-toolkit/product/productSlice";
 import { Modal } from "../../components/molecules/Modal";
-import { useCategoryApi } from "../../API/CategoryAPi";
-import { PencilSquareIcon, TrashIcon  } from "@heroicons/react/16/solid";
+import { useCategoryApi, useRemoveCategory } from "../../API/CategoryAPi";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 
 const CategoriesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,30 +23,49 @@ const CategoriesPage = () => {
   const navigate = useNavigate();
 
   const { categories, getCategories } = useCategoryApi();
+  const { removeCategory, code, setCode } = useRemoveCategory();
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     getCategories();
   }, []);
 
+  useEffect(() => {
+    if (code === 200) {
+      getCategories();
+      setSelectedCategory(null);
+      setCode(null);
+      setModalType(null);
+    }
+  }, [code]);
+
   const renderTableData = useMemo(() => {
     return categories?.map((data) => {
       return {
         ...data,
-        sub_categories: data.sub_categories
-          .map((subCategory) => subCategory.sub_category_name)
-          .join(", "),
+        sub_categories: (
+          <ul style={{ listStyleType: "disc", marginLeft: "20px" }}>
+            {data.sub_categories.map((subCategory) => (
+              <li className="text-[13px]" key={subCategory.sub_category_id}>
+                {subCategory.sub_category_name}
+              </li>
+            ))}
+          </ul>
+        ),
         actions: (
           <div className="flex items-center gap-x-[20px] justify-center">
             <PencilSquareIcon
-              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
+              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
               onClick={() => {
-                dispatch(setSelectedCategory(data));
-                navigate("/create-categories");
+                navigate("/categories/edit/" + data.product_category_id);
               }}
             />
             <TrashIcon
-              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[24px] h-[24px]  text-white"
-              onClick={() => setModalType("delete_category")}
+              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
+              onClick={() => {
+                setModalType("delete_category");
+                setSelectedCategory(data?.product_category_id);
+              }}
             />
           </div>
         ),
@@ -67,7 +85,7 @@ const CategoriesPage = () => {
     );
   };
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const totalPages = Math.ceil(renderTableData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -95,7 +113,7 @@ const CategoriesPage = () => {
             <Button
               text={"Add New Product"}
               classname={
-                "bg-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit"
               }
               icon
               iconSrc={"plus_icon.svg"}
@@ -132,15 +150,20 @@ const CategoriesPage = () => {
             <Button
               text={"Yes"}
               classname={
-                "bg-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
               }
+              onClick={() => {
+                removeCategory(selectedCategory);
+              }}
             />
             <Button
               text={"No"}
               classname={
-                "bg-white border-2 border-[#91680f] py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-[#91680f]"
+                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-primary"
               }
-              onClick={() => setModalType(null)}
+              onClick={() => {
+                setModalType(null);
+              }}
             />
           </div>
         </div>
