@@ -7,9 +7,12 @@ import { Table } from "../../components/organisms/Table";
 import { dummySubCategoryHeading } from "../../mocks/dummyCategories";
 import { PlusIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAddCategory, useGetCategoryById } from "../../API/CategoryAPi";
+import {
+  useAddCategory,
+  useGetCategoryById,
+  useUpdateCategory,
+} from "../../API/CategoryAPi";
 import { Modal } from "../../components/molecules/Modal";
-import { useSelector } from "react-redux";
 
 const CreateCategoriesPage = () => {
   const [categoryName, setCategoryName] = useState(null);
@@ -19,13 +22,20 @@ const CreateCategoriesPage = () => {
   const [newSubCategory, setNewSubCategory] = useState([]);
   const [subCategoryTable, setSubCategoryTable] = useState([]);
   const [deletedSubCategory, setDeletedSubCategory] = useState([]);
-  const { addCategory, code, setCode } = useAddCategory();
+
   const [modalType, setModalType] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
   const param = location.pathname.split("/")[3];
   const { category, getCategoryById } = useGetCategoryById();
+  const { addCategory, code, setCode, loading } = useAddCategory();
+  const {
+    updateCategory,
+    code: updateCode,
+    setCode: setUpdateCode,
+    loading: updateLoading,
+  } = useUpdateCategory();
 
   useEffect(() => {
     if (param) {
@@ -58,8 +68,8 @@ const CreateCategoriesPage = () => {
           <img
             src={imageUrl}
             alt="sub_category_image"
-            width={"100px"}
-            height={"100px"}
+            width={"50px"}
+            height={"50px"}
           />
         ),
         action: (
@@ -88,7 +98,6 @@ const CreateCategoriesPage = () => {
                     ...deletedSubCategory,
                     data.product_sub_category_id,
                   ]);
-                  alert("delete sub category");
                 }
               }}
             />
@@ -96,7 +105,7 @@ const CreateCategoriesPage = () => {
         ),
       };
     });
-  }, [subCategoryTable, newSubCategory]);
+  }, [subCategoryTable, newSubCategory, deletedSubCategory]);
 
   const onSelectImages = (e) => {
     const file = e.target.files[0];
@@ -128,6 +137,8 @@ const CreateCategoriesPage = () => {
         deleted_items: deletedSubCategory,
       };
       console.log("edit: ", edit_category);
+
+      updateCategory(param, edit_category);
     } else {
       const new_category = {
         category_name: categoryName,
@@ -146,7 +157,13 @@ const CreateCategoriesPage = () => {
       navigate("/categories");
       setCode(null);
     }
-  }, [code]);
+
+    if (updateCode === 200) {
+      alert("Success Update Category");
+      navigate("/categories");
+      setUpdateCode(null);
+    }
+  }, [code, updateCode]);
 
   return (
     <div className="flex">
@@ -241,13 +258,23 @@ const CreateCategoriesPage = () => {
                 headings={dummySubCategoryHeading}
                 data={renderTableData}
               />
-              <Button
-                text={param ? "Update" : "Create"}
-                classname={
-                  "bg-primary py-[5px] px-[10px] rounded-[5px] text-white mt-[15px] w-fit ml-auto"
-                }
-                onClick={onSaveData}
-              />
+              {loading || updateLoading ? (
+                <Button
+                  text={"Saving..."}
+                  classname={
+                    "bg-gray-400 py-[5px] px-[10px] rounded-[5px] text-white mt-[15px] w-fit ml-auto"
+                  }
+                  disabled={true}
+                />
+              ) : (
+                <Button
+                  text={param ? "Update" : "Create"}
+                  classname={
+                    "bg-primary py-[5px] px-[10px] rounded-[5px] text-white mt-[15px] w-fit ml-auto"
+                  }
+                  onClick={onSaveData}
+                />
+              )}
             </>
           )}
         </div>

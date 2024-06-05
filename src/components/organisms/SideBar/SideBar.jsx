@@ -4,6 +4,7 @@ import {
   ChevronDoubleLeftIcon,
   ClipboardDocumentListIcon,
   ListBulletIcon,
+  UsersIcon,
 } from "@heroicons/react/16/solid";
 import { useState } from "react";
 import useSignOut from "react-auth-kit/hooks/useSignOut";
@@ -29,6 +30,10 @@ const SideBar = () => {
       icon: (
         <ClipboardDocumentListIcon className="w-[24px] h-[24px] text-white" />
       ),
+    },
+    {
+      label: "Stylist",
+      icon: <UsersIcon className="w-[24px] h-[24px] text-white" />,
     },
   ];
 
@@ -78,13 +83,15 @@ const SideBar = () => {
             logOut();
             navigate("/");
           }}
-          className="p-[10px] bg-white rounded-md flex items-center gap-x-[7px] cursor-pointer"
+          className={`${
+            open ? "p-[10px]" : "p-[5px]"
+          } bg-white rounded-md flex items-center gap-x-[7px] cursor-pointer`}
         >
-          <ArrowLeftStartOnRectangleIcon
-            className={`${
-              open ? "w-[18px] h-[18px]" : "w-[12px] h-[12px]"
-            } text-red-500`}
-          />
+          <div>
+            <ArrowLeftStartOnRectangleIcon
+              className={"w-[16px] h-[16px] text-red-500"}
+            />
+          </div>
           {open && <p className="text-red-500 font-semibold">Logout</p>}
         </div>
       </div>

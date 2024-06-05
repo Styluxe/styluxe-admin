@@ -59,8 +59,7 @@ const ProductsPage = () => {
             <PencilSquareIcon
               className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
               onClick={() => {
-                dispatch(setSelectedProduct(data));
-                navigate("/create-products");
+                navigate("/products/edit/" + data.product_id);
               }}
             />
             <TrashIcon
@@ -120,10 +119,10 @@ const ProductsPage = () => {
               }
               icon
               iconSrc={"plus_icon.svg"}
+              type={"button"}
+              onClick={() => navigate("/create-products")}
             >
-              <a className={`text-white`} href={"/create-products"}>
-                Add New Product
-              </a>
+              <a className={`text-white`}>Add New Product</a>
             </Button>
             <Pagination
               classname={"mt-[20px]"}

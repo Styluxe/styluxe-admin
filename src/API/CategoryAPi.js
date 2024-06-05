@@ -61,8 +61,10 @@ const useGetCategoryById = () => {
 const useAddCategory = () => {
   const [code, setCode] = useState(null);
   const header = useAuthHeader();
+  const [loading, setLoading] = useState(false);
 
   const addCategory = async (data) => {
+    setLoading(true);
     try {
       if (data.sub_categories && data.sub_categories.length > 0) {
         // Use map to return a new array with updated subCategory objects
@@ -81,8 +83,6 @@ const useAddCategory = () => {
         data = { ...data, sub_categories: subCat };
       }
 
-      console.log("testing", data);
-
       const response = await axios.post(
         `${PATH_URL}/admin/category/new`,
         data,
@@ -96,8 +96,10 @@ const useAddCategory = () => {
       setCode(code);
 
       console.log("adding category");
+      setLoading(false);
     } catch (error) {
       console.error("Error adding category:", error);
+      setLoading(false);
     }
   };
 
@@ -128,6 +130,7 @@ const useAddCategory = () => {
     addCategory,
     code,
     setCode,
+    loading,
   };
 };
 
@@ -181,10 +184,86 @@ const useGetAllSubCategory = () => {
   };
 };
 
+const useUpdateCategory = () => {
+  const [code, setCode] = useState(null);
+  const header = useAuthHeader();
+  const [loading, setLoading] = useState(false);
+
+  const updateCategory = async (category_id, data) => {
+    setLoading(true);
+    try {
+      if (data.sub_categories && data.sub_categories.length > 0) {
+        const subCat = await Promise.all(
+          data.sub_categories.map(async (subCategory) => {
+            if (subCategory?.sub_category_image) {
+              const image = await uploadImageToCloudinary(
+                subCategory.sub_category_image,
+              );
+              return { ...subCategory, sub_category_image: image };
+            }
+            return subCategory;
+          }),
+        );
+
+        data = { ...data, sub_categories: subCat };
+      }
+
+      const response = await axios.put(
+        `${PATH_URL}/admin/category/${category_id}`,
+        data,
+        {
+          headers: {
+            Authorization: header,
+          },
+        },
+      );
+
+      const { code } = response.data;
+      setCode(code);
+      console.log("updating category");
+      setLoading(false);
+    } catch (error) {
+      console.error("Error updating category:", error);
+      setLoading(false);
+    }
+  };
+
+  const uploadImageToCloudinary = async (image) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", image);
+      formData.append("upload_preset", "user_preset");
+      formData.append("api_key", "761147494786172");
+
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dkxeflvuu/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const result = await response.json();
+      return result.secure_url;
+    } catch (error) {
+      console.error("Image upload error:", error);
+      throw error;
+    }
+  };
+
+  return {
+    updateCategory,
+    code,
+    setCode,
+    loading,
+  };
+};
+
 export {
   useCategoryApi,
   useGetCategoryById,
   useAddCategory,
   useRemoveCategory,
   useGetAllSubCategory,
+  useUpdateCategory,
 };

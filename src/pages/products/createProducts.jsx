@@ -14,46 +14,69 @@ import {
 import { useSelector } from "react-redux";
 import { selectedProductState } from "../../redux-toolkit/product/productSlice";
 import { useGetAllSubCategory } from "../../API/CategoryAPi";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  useCreateProductApi,
+  useEditProductApi,
+  useGetProductByIdApi,
+} from "../../API/ProductAPI";
+import { PlusIcon, TrashIcon } from "@heroicons/react/16/solid";
 
 const CreateProductsPage = () => {
   const selectedProductData = useSelector(selectedProductState);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const param = location.pathname.split("/")[3];
+
   const { getAllSubCategory, subCategories } = useGetAllSubCategory();
+  const { getProductById, product: productData } = useGetProductByIdApi();
 
   useEffect(() => {
     getAllSubCategory();
-  }, []);
+
+    if (param) {
+      getProductById(param);
+    }
+  }, [param]);
 
   const [product, setProduct] = useState({
-    product_name: selectedProductData.product_name ?? "",
-    product_description: selectedProductData.product_description ?? "",
-    product_sub_category: selectedProductData.product_sub_category ?? "",
-    product_sizes: selectedProductData.sizes ?? [],
-    product_images: selectedProductData.product_images ?? [],
-    product_care: selectedProductData.cares ?? {
+    product_name: "",
+    product_description: "",
+    sub_category_id: "",
+    sizes: [],
+    images: [],
+    cares: {
       washing: "",
       bleaching: "",
       drying: "",
       ironing: "",
       dry_clean: "",
     },
-    product_materials: selectedProductData.materials ?? {
+    materials: {
       fabric: "",
       transparency: "",
       thickness: "",
       stretchiness: "",
     },
-    product_price: selectedProductData.price ?? "",
+    product_price: "",
   });
   const [size, setSize] = useState(null);
   const [stock, setStock] = useState(null);
+  const [sizeTable, setSizeTable] = useState([]);
+  const [imageTable, setImageTable] = useState([]);
   const [image, setImage] = useState(null);
-  const [sizeTable, setSizeTable] = useState(selectedProductData.sizes ?? []);
-  const [imageTable, setImageTable] = useState(
-    selectedProductData.product_images ?? [],
-  );
-  const [imageTableObject, setImageTableObject] = useState(
-    selectedProductData.product_images ?? [],
-  );
+  const [newImage, setNewImage] = useState([]);
+  const [newSize, setNewSize] = useState([]);
+  const [deletedImage, setDeletedImage] = useState([]);
+  const [deletedSize, setDeletedSize] = useState([]);
+
+  const { createProduct, loading, code, setCode } = useCreateProductApi();
+  const {
+    editProduct,
+    code: updateCode,
+    setCode: setUpdateCode,
+    loading: updateLoading,
+  } = useEditProductApi();
 
   const dropdownData = useMemo(() => {
     return subCategories.map((data) => {
@@ -65,11 +88,43 @@ const CreateProductsPage = () => {
     });
   }, [subCategories]);
 
+  useMemo(() => {
+    if (productData) {
+      setProduct({
+        product_name: productData.product_name,
+        product_description: productData.product_description,
+        sub_category_id: productData.sub_category?.product_sub_category_id,
+        sizes: productData.sizes,
+        images: productData.images,
+        cares: productData.cares,
+        materials: productData.materials,
+        product_price: productData.product_price,
+      });
+
+      setSizeTable(productData.sizes);
+      setImageTable(productData.images);
+    }
+  }, [productData]);
+
+  useEffect(() => {
+    if (code === 201) {
+      setCode(null);
+      navigate("/products");
+      alert("Product has been created");
+    }
+
+    if (updateCode === 200) {
+      setUpdateCode(null);
+      navigate("/products");
+      alert("Product has been updated");
+    }
+  }, [code, updateCode]);
+
   const isValidToCreate = (product) => {
     if (
       !product.product_name ||
       !product.product_description ||
-      !product.product_sub_category ||
+      !product.sub_category_id ||
       !product.product_price
     ) {
       return false;
@@ -82,10 +137,7 @@ const CreateProductsPage = () => {
       "dry_clean",
     ];
     for (let prop of careProperties) {
-      if (
-        product.product_materials[prop] === null ||
-        product.product_materials[prop] === ""
-      ) {
+      if (product.materials[prop] === null || product.materials[prop] === "") {
         return false;
       }
     }
@@ -97,59 +149,127 @@ const CreateProductsPage = () => {
       "stretchiness",
     ];
     for (let prop of materialProperties) {
-      if (
-        product.product_materials[prop] === null ||
-        product.product_materials[prop] === ""
-      ) {
+      if (product.materials[prop] === null || product.materials[prop] === "") {
         return false;
       }
     }
     return true;
   };
 
+  const imagePreview = (file) => {
+    return URL.createObjectURL(file);
+  };
+
   const renderImageData = useMemo(() => {
-    return imageTableObject.map((data) => {
+    return imageTable?.concat(newImage).map((data) => {
       return {
         ...data,
         image_url: (
           <img
-            src={URL.createObjectURL(data.image)}
-            className="w-[100px] h-[100px] object-cover"
+            src={
+              data?.image_url instanceof File
+                ? imagePreview(data.image_url)
+                : data?.image_url
+            }
+            className="w-[50px] h-[50px] object-cover"
           />
         ),
         action: (
-          <img
-            src="trash_icon.svg"
-            className="bg-[#d9c075] p-[3px] rounded-md cursor-pointer"
-            onClick={() =>
-              setImageTable(imageTable.filter((item) => item.id !== data.id))
-            }
-          ></img>
+          <div className="flex justify-center">
+            <TrashIcon
+              width={"24px"}
+              height={"24px"}
+              className="bg-primary p-[3px] rounded-md cursor-pointer text-white"
+              onClick={() => {
+                if (data?.image_url instanceof File) {
+                  setNewImage(
+                    newImage.filter(
+                      (item) => item.image_url !== data.image_url,
+                    ),
+                  );
+                } else {
+                  setImageTable(
+                    imageTable.filter(
+                      (item) => item.image_url !== data.image_url,
+                    ),
+                  );
+                  setDeletedImage([...deletedImage, data.product_image_id]);
+                }
+              }}
+            />
+          </div>
         ),
       };
     });
-  }, [imageTableObject]);
+  }, [imageTable, newImage, deletedImage]);
 
   const renderSizeTable = useMemo(() => {
-    return sizeTable.map((data) => {
+    return sizeTable?.concat(newSize).map((data) => {
       return {
         ...data,
         action: (
-          <img
-            src="trash_icon.svg"
-            className="bg-primary p-[3px] rounded-md cursor-pointer"
-            onClick={() =>
-              setSizeTable(sizeTable.filter((item) => item.id !== data.id))
-            }
-          ></img>
+          <div className="flex justify-center">
+            <TrashIcon
+              width={"24px"}
+              height={"24px"}
+              className="bg-primary p-[3px] rounded-md cursor-pointer text-white"
+              onClick={() => {
+                if (data.product_size_id) {
+                  setSizeTable(
+                    sizeTable?.filter(
+                      (item) => item.product_size_id !== data.product_size_id,
+                    ),
+                  );
+                  setDeletedSize([...deletedSize, data.product_size_id]);
+                } else {
+                  setNewSize(newSize.filter((item) => item.size !== data.size));
+                }
+              }}
+            />
+          </div>
         ),
       };
     });
-  }, [sizeTable]);
+  }, [sizeTable, newSize, deletedSize]);
+
+  // console.log("newsize", isValidToCreate(product));
 
   isValidToCreate(product);
-  console.log("data: ", product);
-  console.log("valid ", isValidToCreate(product));
+
+  const onSubmitProduct = () => {
+    if (param) {
+      const edit_product = {
+        ...product,
+        images: newImage,
+        sizes: newSize,
+        deleted_images: deletedImage,
+        deleted_sizes: deletedSize,
+      };
+      console.log("edit", edit_product);
+
+      editProduct(param, edit_product);
+    } else {
+      const submit_product = {
+        ...product,
+        images: newImage,
+        sizes: newSize,
+      };
+
+      console.log("create", submit_product);
+
+      createProduct(submit_product);
+    }
+  };
+
+  console.log("editdata", {
+    ...product,
+    images: newImage,
+    sizes: newSize,
+    deleted_images: deletedImage,
+    deleted_sizes: deletedSize,
+  });
+
+  console.log("update", updateCode);
 
   return (
     <div className="flex">
@@ -157,9 +277,14 @@ const CreateProductsPage = () => {
         <SideBar />
       </div>
       <div className="flex-1 h-screen">
-        <Navbar title={"Create Product"} userLoginName={"Bryan Hanuga"} />
+        <Navbar
+          title={param ? "Edit Product" : "Create Product"}
+          userLoginName={"Bryan Hanuga"}
+        />
         <div className="flex flex-col p-[20px] m-[40px] border-[1px] border-slate-300 h-[85%] gap-y-[15px] overflow-y-auto">
-          <p className="text-[18px] font-semibold">Create a New Product</p>
+          <p className="text-[18px] font-semibold">
+            {param ? "Edit Existing Product" : "Create a New Product"}
+          </p>
           <InputLabel
             inputClassName={
               "border-[1px] border-gray-400 p-[3px] rounded-[5px] w-[20%]"
@@ -175,7 +300,7 @@ const CreateProductsPage = () => {
           />
           <InputLabel
             inputClassName={
-              "border-[1px] border-gray-400 p-[3px] rounded-[5px] w-[20%]"
+              "border-[1px] border-gray-400 p-[3px] rounded-[5px] w-[50%] h-[150px]"
             }
             label={"Product Description"}
             name={"product_description"}
@@ -193,10 +318,8 @@ const CreateProductsPage = () => {
             placeholder={"Choose Sub Category"}
             menu={dropdownData}
             classname={"w-[20%]"}
-            onClickMenu={(e) =>
-              setProduct({ ...product, product_sub_category: e })
-            }
-            selectedOption={product.product_sub_category}
+            onClickMenu={(e) => setProduct({ ...product, sub_category_id: e })}
+            selectedOption={product.sub_category_id}
           />
           <div className="h-[1px] border-b-[1px] border-gray-400 " />
           <p className="text-[18px] font-semibold">Input Sizes and Stock</p>
@@ -206,44 +329,44 @@ const CreateProductsPage = () => {
                 "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
               }
               label={"Size"}
-              name={"size"}
               placeholder={"Input Size"}
               labelPosition="top"
               classname={"w-[10%]"}
               onChange={(e) => setSize(e.target.value)}
+              value={size}
             />
             <InputLabel
               inputClassName={
                 "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
               }
               label={"Stock"}
-              name={"stock"}
               placeholder={"Input Stock"}
               labelPosition="top"
               type={"number"}
               classname={"w-[10%]"}
               onChange={(e) => setStock(e.target.value)}
+              value={stock}
             />
             <Button
-              text={"Add"}
               classname={`${
                 size && stock ? "bg-primary" : "bg-gray-400 pointer-events-none"
               } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
-              icon
-              iconSrc={"plus_icon.svg"}
+              type={"button"}
               onClick={() => {
-                setSizeTable([
-                  ...sizeTable,
-                  {
-                    id: sizeTable.length + 1,
-                    size: size,
-                    stock: stock,
-                  },
-                ]);
+                if (size && stock) {
+                  setNewSize((prev) => [...prev, { size, stock }]);
+                  setSize(null);
+                  setStock(null);
+                }
               }}
-            />
+            >
+              <div className="flex items-center gap-1">
+                <PlusIcon width={20} height={20} />
+                <p>Add</p>
+              </div>
+            </Button>
           </div>
-          {sizeTable.length > 0 && (
+          {renderSizeTable?.length > 0 && (
             <Table headings={dummySizeHeading} data={renderSizeTable} />
           )}
           <div className="h-[1px] border-b-[1px] border-gray-400 " />
@@ -261,31 +384,27 @@ const CreateProductsPage = () => {
               accept="image/*"
             />
             <Button
-              text={"Add"}
               classname={`${
                 image ? "bg-primary" : "bg-gray-400 pointer-events-none"
               } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
-              icon
-              iconSrc={"plus_icon.svg"}
               onClick={() => {
-                setImageTable([
-                  ...imageTable,
+                setNewImage([
+                  ...newImage,
                   {
-                    id: imageTable.length + 1,
-                    image_url: image.name,
-                  },
-                ]);
-                setImageTableObject([
-                  ...imageTableObject,
-                  {
-                    id: imageTable.length + 1,
                     image_url: image,
                   },
                 ]);
+
+                setImage(null);
               }}
-            />
+            >
+              <div className="flex items-center gap-1">
+                <PlusIcon width={20} height={20} />
+                <p>Add</p>
+              </div>
+            </Button>
           </div>
-          {imageTable.length > 0 && (
+          {renderImageData?.length > 0 && (
             <Table headings={dummyImageHeading} data={renderImageData} />
           )}
           <div className="h-[1px] border-b-[1px] border-gray-400 " />
@@ -305,13 +424,13 @@ const CreateProductsPage = () => {
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  product_care: {
-                    ...product.product_care,
+                  cares: {
+                    ...product.cares,
                     washing: e.target.value,
                   },
                 })
               }
-              value={product.product_care?.washing}
+              value={product.cares?.washing}
             />
             <InputLabel
               inputClassName={
@@ -325,13 +444,13 @@ const CreateProductsPage = () => {
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  product_care: {
-                    ...product.product_care,
+                  cares: {
+                    ...product.cares,
                     bleaching: e.target.value,
                   },
                 })
               }
-              value={product.product_care?.bleaching}
+              value={product.cares?.bleaching}
             />
             <InputLabel
               inputClassName={
@@ -345,13 +464,13 @@ const CreateProductsPage = () => {
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  product_care: {
-                    ...product.product_care,
+                  cares: {
+                    ...product.cares,
                     drying: e.target.value,
                   },
                 })
               }
-              value={product.product_care?.drying}
+              value={product.cares?.drying}
             />
             <InputLabel
               inputClassName={
@@ -365,13 +484,13 @@ const CreateProductsPage = () => {
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  product_care: {
-                    ...product.product_care,
+                  cares: {
+                    ...product.cares,
                     ironing: e.target.value,
                   },
                 })
               }
-              value={product.product_care?.ironing}
+              value={product.cares?.ironing}
             />
             <InputLabel
               inputClassName={
@@ -385,13 +504,13 @@ const CreateProductsPage = () => {
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  product_care: {
-                    ...product.product_care,
+                  cares: {
+                    ...product.cares,
                     dry_clean: e.target.value,
                   },
                 })
               }
-              value={product.product_care?.dry_clean}
+              value={product.cares?.dry_clean}
             />
           </div>
 
@@ -412,13 +531,13 @@ const CreateProductsPage = () => {
               onChange={(e) =>
                 setProduct({
                   ...product,
-                  product_materials: {
-                    ...product.product_materials,
+                  materials: {
+                    ...product.materials,
                     fabric: e.target.value,
                   },
                 })
               }
-              value={product.product_materials?.fabric}
+              value={product.materials?.fabric}
             />
             <Dropdown
               labelText={"Product Transparency"}
@@ -429,13 +548,13 @@ const CreateProductsPage = () => {
               onClickMenu={(e) =>
                 setProduct({
                   ...product,
-                  product_materials: {
-                    ...product.product_materials,
+                  materials: {
+                    ...product.materials,
                     transparency: e,
                   },
                 })
               }
-              selectedOption={product.product_materials.transparency}
+              selectedOption={product.materials?.transparency}
             />
             <Dropdown
               labelText={"Product Thickness"}
@@ -446,13 +565,13 @@ const CreateProductsPage = () => {
               onClickMenu={(e) =>
                 setProduct({
                   ...product,
-                  product_materials: {
-                    ...product.product_materials,
+                  materials: {
+                    ...product.materials,
                     thickness: e,
                   },
                 })
               }
-              selectedOption={product.product_materials.thickness}
+              selectedOption={product.materials?.thickness}
             />
             <Dropdown
               labelText={"Product Stretchiness"}
@@ -463,13 +582,13 @@ const CreateProductsPage = () => {
               onClickMenu={(e) =>
                 setProduct({
                   ...product,
-                  product_materials: {
-                    ...product.product_materials,
+                  materials: {
+                    ...product.materials,
                     stretchiness: e,
                   },
                 })
               }
-              selectedOption={product.product_materials.stretchiness}
+              selectedOption={product.materials?.stretchiness}
             />
           </div>
           <div className="h-[1px] border-b-[1px] border-gray-400 " />
@@ -492,23 +611,26 @@ const CreateProductsPage = () => {
               value={product.product_price}
             />
           </div>
-          <Button
-            text={"Save"}
-            classname={`${
-              isValidToCreate(product) &&
-              sizeTable.length > 0 &&
-              imageTable.length > 0
-                ? "bg-primary"
-                : "bg-gray-400 pointer-events-none"
-            } py-[5px] px-[10px] rounded-[5px] text-white text-[18px] mt-[15px] w-fit ml-auto`}
-            onClick={() => {
-              setProduct({
-                ...product,
-                product_sizes: [...sizeTable],
-                product_images: [...imageTableObject],
-              });
-            }}
-          />
+          {loading || updateLoading ? (
+            <Button
+              text={"Saving..."}
+              classname={
+                "bg-gray-400 pointer-events-none py-[5px] px-[10px] rounded-[5px] text-white text-[18px] mt-[15px] w-fit ml-auto"
+              }
+            />
+          ) : (
+            <Button
+              text={"Save"}
+              classname={`${
+                isValidToCreate(product) &&
+                sizeTable.length > 0 &&
+                imageTable.length > 0
+                  ? "bg-primary"
+                  : "bg-gray-400 pointer-events-none"
+              } py-[5px] px-[10px] rounded-[5px] text-white text-[18px] mt-[15px] w-fit ml-auto`}
+              onClick={onSubmitProduct}
+            />
+          )}
         </div>
       </div>
     </div>

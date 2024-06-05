@@ -13,6 +13,8 @@ import OrdersPage from "./pages/orders/orders.jsx";
 import AuthProvider from "react-auth-kit/AuthProvider";
 import createStore from "react-auth-kit/createStore";
 import RequireAuth from "@auth-kit/react-router/RequireAuth";
+import Stylist from "./pages/Stylist/Stylist.jsx";
+import StylistCreate from "./pages/Stylist/StylistCreate.jsx";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
   },
   {
     path: "/create-products",
+    element: (
+      <RequireAuth fallbackPath="/">
+        <CreateProductsPage />
+      </RequireAuth>
+    ),
+  },
+  {
+    path: "/products/edit/:id",
     element: (
       <RequireAuth fallbackPath="/">
         <CreateProductsPage />
@@ -66,6 +76,14 @@ const router = createBrowserRouter([
         <OrdersPage />
       </RequireAuth>
     ),
+  },
+  {
+    path: "/stylist",
+    element: <Stylist />,
+  },
+  {
+    path: "/create-stylist",
+    element: <StylistCreate />,
   },
 ]);
 

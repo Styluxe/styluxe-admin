@@ -46,17 +46,15 @@ export const dummySizeHeading = [
   {
     id: "size",
     label: "Size",
-    width: "30%",
   },
   {
     id: "stock",
     label: "Stock",
-    width: "50%",
   },
   {
     id: "action",
     label: "Action",
-    width: "20%",
+    width: "5%",
   },
 ];
 
@@ -64,12 +62,11 @@ export const dummyImageHeading = [
   {
     id: "image_url",
     label: "Image URL",
-    width: "30%",
   },
   {
     id: "action",
     label: "Action",
-    width: "20%",
+    width: "5%",
   },
 ];
 

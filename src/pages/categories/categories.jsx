@@ -13,7 +13,11 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Modal } from "../../components/molecules/Modal";
 import { useCategoryApi, useRemoveCategory } from "../../API/CategoryAPi";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
+import {
+  PencilSquareIcon,
+  StopIcon,
+  TrashIcon,
+} from "@heroicons/react/16/solid";
 
 const CategoriesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,13 +48,27 @@ const CategoriesPage = () => {
       return {
         ...data,
         sub_categories: (
-          <ul style={{ listStyleType: "disc", marginLeft: "20px" }}>
+          // <ul style={{ listStyleType: "disc", marginLeft: "20px" }}>
+          //   {data.sub_categories.map((subCategory) => (
+          //     <li className="text-[13px]" key={subCategory.sub_category_id}>
+          //       {subCategory.sub_category_name}
+          //     </li>
+          //   ))}
+          // </ul>
+          <div className="grid grid-cols-2">
             {data.sub_categories.map((subCategory) => (
-              <li className="text-[13px]" key={subCategory.sub_category_id}>
-                {subCategory.sub_category_name}
-              </li>
+              <div
+                key={subCategory.sub_category_id}
+                className="flex items-center gap-1"
+              >
+                <StopIcon className="h-2 w-2 text-primary " />
+
+                <p className="text-[13px]" key={subCategory.sub_category_id}>
+                  {subCategory.sub_category_name}
+                </p>
+              </div>
             ))}
-          </ul>
+          </div>
         ),
         actions: (
           <div className="flex items-center gap-x-[20px] justify-center">
@@ -117,10 +135,10 @@ const CategoriesPage = () => {
               }
               icon
               iconSrc={"plus_icon.svg"}
+              type={"button"}
+              onClick={() => navigate("/create-categories")}
             >
-              <a className={`text-white`} href={"/create-categories"}>
-                Add New Category
-              </a>
+              <a className={`text-white`}>Add New Category</a>
             </Button>
             <Pagination
               classname={"mt-[20px]"}
