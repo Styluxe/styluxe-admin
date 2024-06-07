@@ -43,19 +43,18 @@ const CategoriesPage = () => {
     }
   }, [code]);
 
+  useEffect(() => {
+    if (categories.length > 0) {
+      setTableData(categories);
+    }
+  }, [categories]);
+
   const renderTableData = useMemo(() => {
-    return categories?.map((data) => {
+    return tableData?.map((data) => {
       return {
         ...data,
         sub_categories: (
-          // <ul style={{ listStyleType: "disc", marginLeft: "20px" }}>
-          //   {data.sub_categories.map((subCategory) => (
-          //     <li className="text-[13px]" key={subCategory.sub_category_id}>
-          //       {subCategory.sub_category_name}
-          //     </li>
-          //   ))}
-          // </ul>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-rows-3 grid-flow-col w-[70%]">
             {data.sub_categories.map((subCategory) => (
               <div
                 key={subCategory.sub_category_id}
@@ -81,15 +80,21 @@ const CategoriesPage = () => {
             <TrashIcon
               className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
               onClick={() => {
-                setModalType("delete_category");
-                setSelectedCategory(data?.product_category_id);
+                if (data.sub_categories.length > 0) {
+                  alert(
+                    "Category cannot be deleted because it has sub-categories",
+                  );
+                } else {
+                  setModalType("delete_category");
+                  setSelectedCategory(data?.product_category_id);
+                }
               }}
             />
           </div>
         ),
       };
     });
-  }, [categories, dispatch, navigate]);
+  }, [tableData, navigate]);
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -97,7 +102,7 @@ const CategoriesPage = () => {
 
   const handleSearch = (query) => {
     setTableData(
-      CategoryBodyData.filter((item) =>
+      categories.filter((item) =>
         item.category_name.toLowerCase().includes(query.toLowerCase()),
       ),
     );

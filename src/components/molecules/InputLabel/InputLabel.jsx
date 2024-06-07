@@ -30,7 +30,9 @@ const InputLabel = ({
         />
       ) : (
         <input
-          className={`placeholder:text-muted ${inputClassName}`}
+          className={`placeholder:text-muted ${
+            disabled && "cursor-not-allowed"
+          }  ${inputClassName}`}
           name={name}
           placeholder={placeholder ? placeholder : ""}
           disabled={disabled}

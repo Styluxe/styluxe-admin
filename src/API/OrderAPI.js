@@ -30,4 +30,34 @@ const useGetOrderApi = () => {
   };
 };
 
-export { useGetOrderApi };
+const useChangeOrderStatus = () => {
+  const [code, setCode] = useState(null);
+  const header = useAuthHeader();
+  const changeOrderStatus = async (id, status) => {
+    try {
+      const response = await axios.put(
+        `${PATH_URL}/admin/order-status/${id}`,
+        {
+          order_status: status,
+        },
+        {
+          headers: {
+            Authorization: header,
+          },
+        },
+      );
+      const { code } = response.data;
+      setCode(code);
+      console.log("status changed");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return {
+    changeOrderStatus,
+    code,
+    setCode,
+  };
+};
+
+export { useGetOrderApi, useChangeOrderStatus };

@@ -8,6 +8,10 @@ export const dummySubCategoryHeading = [
     label: "Sub Category Image",
   },
   {
+    id: "total_products",
+    label: "Total Products",
+  },
+  {
     id: "action",
     label: "Action",
     width: "5%",

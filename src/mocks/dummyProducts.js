@@ -61,7 +61,7 @@ export const dummySizeHeading = [
 export const dummyImageHeading = [
   {
     id: "image_url",
-    label: "Image URL",
+    label: "Images",
   },
   {
     id: "action",

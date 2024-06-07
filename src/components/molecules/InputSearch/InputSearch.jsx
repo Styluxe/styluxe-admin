@@ -7,7 +7,7 @@ const InputSearch = ({ classname, placeholder, onSearch, inputClassName }) => {
     <div className={`flex items-center gap-x-[15px] ${classname}`}>
       <input
         type="text"
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => onSearch(e.target.value)}
         placeholder={placeholder}
         className={inputClassName}
       />

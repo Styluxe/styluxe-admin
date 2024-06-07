@@ -191,9 +191,37 @@ const useEditProductApi = () => {
   };
 };
 
+const useRemoveProductApi = () => {
+  const [code, setCode] = useState(null);
+  const header = useAuthHeader();
+  const removeProduct = async (id) => {
+    try {
+      const response = await axios.put(
+        `${PATH_URL}/admin/archive/product/${id}`,
+        {
+          headers: {
+            Authorization: header,
+          },
+        },
+      );
+      const { code } = response.data;
+      setCode(code);
+      console.log("fetching product");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return {
+    removeProduct,
+    code,
+    setCode,
+  };
+};
+
 export {
   useGetProductApi,
   useGetProductByIdApi,
   useCreateProductApi,
   useEditProductApi,
+  useRemoveProductApi,
 };

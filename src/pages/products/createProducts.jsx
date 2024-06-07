@@ -355,8 +355,8 @@ const CreateProductsPage = () => {
               onClick={() => {
                 if (size && stock) {
                   setNewSize((prev) => [...prev, { size, stock }]);
-                  setSize(null);
-                  setStock(null);
+                  setSize("");
+                  setStock("");
                 }
               }}
             >

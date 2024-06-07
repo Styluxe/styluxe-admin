@@ -8,16 +8,10 @@ import { Table } from "../../components/organisms/Table";
 import { bodyData, heading } from "../../mocks/dummyProducts";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setSelectedProduct } from "../../redux-toolkit/product/productSlice";
 import { Modal } from "../../components/molecules/Modal";
 
-import useAuthHeader from "react-auth-kit/hooks/useAuthHeader";
-import { useGetProductApi } from "../../API/ProductAPI";
-import {
-  PencilIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from "@heroicons/react/16/solid";
+import { useGetProductApi, useRemoveProductApi } from "../../API/ProductAPI";
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 
 const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,17 +19,33 @@ const ProductsPage = () => {
   const [modalType, setModalType] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const { getProduct, products } = useGetProductApi();
-
-  console.log(products);
+  const { removeProduct, code, setCode } = useRemoveProductApi();
 
   useEffect(() => {
     getProduct();
   }, []);
 
+  useEffect(() => {
+    if (code === 200) {
+      getProduct();
+      setCode(null);
+      setSelectedProduct(null);
+      setModalType(null);
+      alert("Product deleted successfully");
+    }
+  }, [code]);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      setTableData(products);
+    }
+  }, [products]);
+
   const renderTableData = useMemo(() => {
-    return products?.map((data) => {
+    return tableData?.map((data) => {
       return {
         ...data,
         sizes: data.sizes
@@ -64,21 +74,25 @@ const ProductsPage = () => {
             />
             <TrashIcon
               className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
-              onClick={() => setModalType("delete_product")}
+              onClick={() => {
+                setModalType("delete_product");
+                setSelectedProduct(data.product_id);
+              }}
             />
           </div>
         ),
       };
     });
-  }, [products, dispatch, navigate]);
+  }, [tableData, navigate]);
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
   const handleSearch = (query) => {
+    console.log(query);
     setTableData(
-      bodyData.filter((item) =>
+      products.filter((item) =>
         item.product_name.toLowerCase().includes(query.toLowerCase()),
       ),
     );
@@ -148,17 +162,20 @@ const ProductsPage = () => {
           <p className="text-[20px] text-center">
             Do you want to delete this product?
           </p>
-          <div className="flex gap-[30px]">
+          <div className="flex gap-[30px] w-full">
             <Button
               text={"Yes"}
               classname={
-                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-full text-white"
               }
+              onClick={() => {
+                removeProduct(selectedProduct);
+              }}
             />
             <Button
               text={"No"}
               classname={
-                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-primary"
+                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-full text-primary"
               }
               onClick={() => setModalType(null)}
             />

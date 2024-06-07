@@ -8,7 +8,12 @@ import { Table } from "../../components/organisms/Table";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useGetStylistApi } from "../../API/StylistAPI";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
+import {
+  ArchiveBoxXMarkIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/16/solid";
+import { IoPersonRemoveSharp } from "react-icons/io5";
 
 const Stylist = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,9 +47,9 @@ const Stylist = () => {
       label: "Price",
     },
     {
-      id: "actions",
-      label: "Action",
-      width: "5%",
+      id: "online_status",
+      label: "Status",
+      width: "10%",
     },
   ];
 
@@ -52,8 +57,27 @@ const Stylist = () => {
     return stylists?.map((data) => {
       return {
         ...data,
+        brand_name: data?.brand_name || "N/A",
+        type: data?.type || "N/A",
         full_name: data?.user?.first_name + " " + data?.user?.last_name,
-        price: "Rp " + parseFloat(data?.price).toLocaleString("id-ID"),
+        price:
+          "Rp " +
+          (data?.price
+            ? parseFloat(data?.price).toLocaleString("id-ID")
+            : "N/A"),
+        online_status: (
+          <div className="flex items-center justify-center">
+            <div
+              className={`flex items-center gap-[5px] p-[5px]  rounded-md w-fit  justify-center ${
+                data?.online_status === "online" ? "bg-green-500" : "bg-red-500"
+              }`}
+            >
+              <p className="text-[14px] text-white ">
+                {data?.online_status === "online" ? "Active" : "Inactive"}
+              </p>
+            </div>
+          </div>
+        ),
         actions: (
           <div className="flex items-center gap-[15px] justify-center">
             {/* <PencilSquareIcon
@@ -62,8 +86,8 @@ const Stylist = () => {
                 navigate("/products/edit/" + data.product_id);
               }}
             /> */}
-            <TrashIcon
-              className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
+            <IoPersonRemoveSharp
+              className="bg-primary p-[5px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
               onClick={() => setModalType("delete_product")}
             />
           </div>

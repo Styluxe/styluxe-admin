@@ -55,6 +55,8 @@ const CreateCategoriesPage = () => {
     return URL.createObjectURL(file);
   };
 
+  console.log("subCategoryTable: ", subCategoryTable);
+
   const renderTableData = useMemo(() => {
     return subCategoryTable.concat(newSubCategory).map((data) => {
       const imageUrl =
@@ -72,6 +74,9 @@ const CreateCategoriesPage = () => {
             height={"50px"}
           />
         ),
+        total_products: (
+          <p className="text-center">{data?.products?.length ?? 0}</p>
+        ),
         action: (
           <div className="flex justify-center">
             <TrashIcon
@@ -86,6 +91,8 @@ const CreateCategoriesPage = () => {
                         item.sub_category_name !== data.sub_category_name,
                     ),
                   );
+                } else if (data?.products?.length > 0) {
+                  alert("Can't delete sub category with products");
                 } else {
                   setSubCategoryTable(
                     subCategoryTable.filter(

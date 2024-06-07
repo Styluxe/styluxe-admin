@@ -25,7 +25,13 @@ const LoginPage = () => {
       navigate("/products");
       setCode(null);
     } else if (code === 401) {
-      setError("Unauthorized");
+      setError("Wrong Email or Password");
+      setCode(null);
+    } else if (code === 404) {
+      setError("Email not found");
+      setCode(null);
+    } else if (code === 403) {
+      setError("you are not authorized");
     }
   }, [code]);
 
@@ -36,32 +42,39 @@ const LoginPage = () => {
         alt="logo"
         className="w-[150px] h-[150px]"
       />
-      <div className="w-[350px] h-fit bg-white rounded-[10px] drop-shadow-lg flex flex-col gap-y-[25px] items-center pb-[40px]">
+      <div className="w-[350px] h-fit bg-white rounded-[10px] drop-shadow-lg ">
         <div className="bg-primary text-white text-center text-[25px] py-[10px] rounded-t-[10px] font-semibold w-full">
           Styluxe Admin Login
         </div>
-        <input
-          className="border-[2px] border-gray-300 p-[8px] rounded-[10px] w-[80%]"
-          placeholder="Email Address"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-        />
-        <input
-          className="border-[2px] border-gray-300 p-[8px] rounded-[10px] w-[80%]"
-          placeholder="Password"
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
-        {error && <div className="text-red-500">{error}</div>}
-        <Button
-          type={"button"}
-          text={"Login"}
-          classname={
-            "bg-primary p-[8px] text-white w-[80%] rounded-[10px] font-semibold"
-          }
-          onClick={() => login(email, password)}
-        />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            login(email, password);
+          }}
+          className="flex flex-col gap-y-[25px] items-center pb-[40px] py-[25px]"
+        >
+          <input
+            className="border-[2px] border-gray-300 p-[8px] rounded-[10px] w-[80%]"
+            placeholder="Email Address"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+          />
+          <input
+            className="border-[2px] border-gray-300 p-[8px] rounded-[10px] w-[80%]"
+            placeholder="Password"
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+          />
+          {error && <div className="text-red-500">{error}</div>}
+          <Button
+            type={"submit"}
+            text={"Login"}
+            classname={
+              "bg-primary p-[8px] text-white w-[80%] rounded-[10px] font-semibold"
+            }
+          />
+        </form>
       </div>
     </div>
   );

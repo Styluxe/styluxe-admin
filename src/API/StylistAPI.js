@@ -30,4 +30,55 @@ const useGetStylistApi = () => {
   };
 };
 
-export { useGetStylistApi };
+const useGetnonStylistApi = () => {
+  const [nonStylists, setNonStylists] = useState([]);
+  const [code, setCode] = useState(null);
+  const header = useAuthHeader();
+  const getNonStylist = async () => {
+    try {
+      const response = await axios.get(`${PATH_URL}/admin/non-stylist`, {
+        headers: {
+          Authorization: header,
+        },
+      });
+      const { data, code } = response.data;
+      setNonStylists(data);
+      setCode(code);
+      console.log("fetching stylist");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return {
+    getNonStylist,
+    nonStylists,
+    code,
+    setCode,
+  };
+};
+
+const useAssignStylistApi = () => {
+  const [code, setCode] = useState(null);
+  const header = useAuthHeader();
+  const assignStylist = async (data) => {
+    try {
+      const response = await axios.post(`${PATH_URL}/admin/assign`, data, {
+        headers: {
+          Authorization: header,
+        },
+      });
+      const { code } = response.data;
+      setCode(code);
+      console.log("Assign stylist");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return {
+    assignStylist,
+    code,
+    setCode,
+  };
+};
+
+export { useGetStylistApi, useGetnonStylistApi, useAssignStylistApi };

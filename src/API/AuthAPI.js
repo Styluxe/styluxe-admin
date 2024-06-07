@@ -39,7 +39,8 @@ const useAuthApi = () => {
         setCode(401);
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error:", error.response);
+      setCode(error.response?.status);
     }
   };
 
