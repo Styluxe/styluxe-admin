@@ -34,13 +34,16 @@ const useGetnonStylistApi = () => {
   const [nonStylists, setNonStylists] = useState([]);
   const [code, setCode] = useState(null);
   const header = useAuthHeader();
-  const getNonStylist = async () => {
+  const getNonStylist = async (search) => {
     try {
-      const response = await axios.get(`${PATH_URL}/admin/non-stylist`, {
-        headers: {
-          Authorization: header,
+      const response = await axios.get(
+        `${PATH_URL}/admin/non-stylist?search=${search}`,
+        {
+          headers: {
+            Authorization: header,
+          },
         },
-      });
+      );
       const { data, code } = response.data;
       setNonStylists(data);
       setCode(code);

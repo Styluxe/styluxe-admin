@@ -4,9 +4,9 @@ import { SideBar } from "../../components/organisms/SideBar";
 import { Button } from "../../components/atoms/Button";
 import { useEffect, useMemo, useState } from "react";
 import { Table } from "../../components/organisms/Table";
-import { dummySubCategoryDropdown } from "../../mocks/dummyCategories";
 import { Dropdown } from "../../components/molecules/Dropdown";
 import {
+  ReferenceHeading,
   dummyImageHeading,
   dummyMaterialDropdown,
   dummySizeHeading,
@@ -69,6 +69,14 @@ const CreateProductsPage = () => {
   const [newSize, setNewSize] = useState([]);
   const [deletedImage, setDeletedImage] = useState([]);
   const [deletedSize, setDeletedSize] = useState([]);
+  const [reference, setReference] = useState({
+    image_url: null,
+    model_height: "",
+    model_weight: "",
+    product_size: "",
+  });
+  const [referenceTable, setReferenceTable] = useState([]);
+  const [newReference, setNewReference] = useState([]);
 
   const { createProduct, loading, code, setCode } = useCreateProductApi();
   const {
@@ -103,8 +111,11 @@ const CreateProductsPage = () => {
 
       setSizeTable(productData.sizes);
       setImageTable(productData.images);
+      setReferenceTable(productData?.references);
     }
   }, [productData]);
+
+  console.log("reference", reference);
 
   useEffect(() => {
     if (code === 201) {
@@ -119,6 +130,8 @@ const CreateProductsPage = () => {
       alert("Product has been updated");
     }
   }, [code, updateCode]);
+
+  console.log("pridac", productData);
 
   const isValidToCreate = (product) => {
     if (
@@ -152,6 +165,18 @@ const CreateProductsPage = () => {
       if (product.materials[prop] === null || product.materials[prop] === "") {
         return false;
       }
+    }
+    return true;
+  };
+
+  const referenceValid = () => {
+    if (
+      !reference.image_url ||
+      !reference.model_height ||
+      !reference.model_weight ||
+      !reference.product_size
+    ) {
+      return false;
     }
     return true;
   };
@@ -232,7 +257,49 @@ const CreateProductsPage = () => {
     });
   }, [sizeTable, newSize, deletedSize]);
 
-  // console.log("newsize", isValidToCreate(product));
+  const sizeRemap = useMemo(() => {
+    return renderSizeTable.map((data) => {
+      return {
+        id: renderSizeTable.length + 1,
+        label: data.size,
+        value: data.size,
+      };
+    });
+  }, [renderSizeTable]);
+
+  const renderReferenceTable = useMemo(() => {
+    return referenceTable?.concat(newReference).map((data) => {
+      return {
+        ...data,
+        image_url: (
+          <img
+            src={
+              data?.image_url instanceof File
+                ? imagePreview(data.image_url)
+                : data?.image_url
+            }
+            className="w-[50px] h-[50px] object-cover"
+          />
+        ),
+        action: (
+          <div className="flex justify-center">
+            <TrashIcon
+              width={"24px"}
+              height={"24px"}
+              className="bg-primary p-[3px] rounded-md cursor-pointer text-white"
+              onClick={() => {
+                setReferenceTable(
+                  referenceTable?.filter(
+                    (item) => item.reference_id !== data.reference_id,
+                  ),
+                );
+              }}
+            />
+          </div>
+        ),
+      };
+    });
+  }, [referenceTable, newReference]);
 
   isValidToCreate(product);
 
@@ -244,6 +311,7 @@ const CreateProductsPage = () => {
         sizes: newSize,
         deleted_images: deletedImage,
         deleted_sizes: deletedSize,
+        reference: newReference,
       };
       console.log("edit", edit_product);
 
@@ -253,6 +321,7 @@ const CreateProductsPage = () => {
         ...product,
         images: newImage,
         sizes: newSize,
+        reference: newReference,
       };
 
       console.log("create", submit_product);
@@ -344,7 +413,11 @@ const CreateProductsPage = () => {
               labelPosition="top"
               type={"number"}
               classname={"w-[10%]"}
-              onChange={(e) => setStock(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, "");
+
+                setStock(value);
+              }}
               value={stock}
             />
             <Button
@@ -611,6 +684,114 @@ const CreateProductsPage = () => {
               value={product.product_price}
             />
           </div>
+          <div className="h-[1px] border-b-[1px] border-gray-400 " />
+          <p className="text-[18px] font-semibold">Input Product References</p>
+          <div className="flex gap-[30px] w-full items-center">
+            <InputLabel
+              label={"Reference Image"}
+              name={"product_image"}
+              labelPosition="top"
+              type={"file"}
+              classname={"w-[15%]"}
+              onChange={(e) =>
+                setReference({
+                  ...reference,
+                  image_url: e.target.files[0],
+                })
+              }
+              accept="image/*"
+            />
+            <InputLabel
+              inputClassName={
+                "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
+              }
+              label={"Model Height"}
+              name={"model_height"}
+              placeholder={"Input Model Height"}
+              labelPosition="top"
+              classname={"w-[15%]"}
+              onChange={(e) =>
+                setReference({
+                  ...reference,
+                  model_height: e.target.value,
+                })
+              }
+              value={reference.model_height}
+            />
+            <InputLabel
+              inputClassName={
+                "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
+              }
+              label={"Model Weight"}
+              name={"model_weight"}
+              placeholder={"Input Model Weight"}
+              labelPosition="top"
+              classname={"w-[15%]"}
+              onChange={(e) =>
+                setReference({
+                  ...reference,
+                  model_weight: e.target.value,
+                })
+              }
+              value={reference.model_weight}
+            />
+            {/* <InputLabel
+              inputClassName={
+                "border-[1px] border-gray-400 p-[3px] rounded-[5px]"
+              }
+              label={"Product Size"}
+              name={"product_size"}
+              placeholder={"Input Product Size"}
+              labelPosition="top"
+              classname={"w-[15%]"}
+              onChange={(e) =>
+                setReference({
+                  ...reference,
+                  product_size: e.target.value,
+                })
+              }
+              value={reference.product_size}
+            /> */}
+            <Dropdown
+              labelText={"Product Size"}
+              withLabel={true}
+              placeholder={"Choose Product Size"}
+              menu={sizeRemap}
+              classname={"w-[15%]"}
+              onClickMenu={(e) =>
+                setReference({
+                  ...reference,
+                  product_size: e,
+                })
+              }
+              selectedOption={reference.product_size}
+            />
+            <Button
+              classname={`${
+                referenceValid()
+                  ? "bg-primary"
+                  : "bg-gray-400 pointer-events-none"
+              } px-[15px] py-[5px] rounded-[5px] text-white mt-[15px] w-fit`}
+              onClick={() => {
+                setNewReference([...newReference, reference]);
+                setReference({
+                  image_url: null,
+                  model_height: "",
+                  model_weight: "",
+                  product_size: "",
+                });
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <PlusIcon width={20} height={20} />
+                <p>Add</p>
+              </div>
+            </Button>
+          </div>
+          {renderReferenceTable?.length > 0 && (
+            <Table headings={ReferenceHeading} data={renderReferenceTable} />
+          )}
+
           {loading || updateLoading ? (
             <Button
               text={"Saving..."}
@@ -623,8 +804,8 @@ const CreateProductsPage = () => {
               text={"Save"}
               classname={`${
                 isValidToCreate(product) &&
-                sizeTable.length > 0 &&
-                imageTable.length > 0
+                newSize.length > 0 &&
+                newImage.length > 0
                   ? "bg-primary"
                   : "bg-gray-400 pointer-events-none"
               } py-[5px] px-[10px] rounded-[5px] text-white text-[18px] mt-[15px] w-fit ml-auto`}

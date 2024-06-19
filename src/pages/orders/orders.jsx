@@ -72,6 +72,10 @@ const OrdersPage = () => {
       return {
         color: "bg-green-500",
       };
+    } else if (status === "done") {
+      return {
+        color: "bg-green-500",
+      };
     }
   };
 
@@ -115,9 +119,10 @@ const OrdersPage = () => {
             {data.order_status != "pending" &&
               data.order_status != "delivered" &&
               data.order_status != "cancelled" &&
-              data.order_status != "accepted" && (
+              data.order_status != "accepted" &&
+              data.order_status != "done" && (
                 <Button
-                  text={renderButtonLabel(data?.order_status).label}
+                  text={renderButtonLabel(data?.order_status)?.label}
                   classname={
                     "bg-primary py-[3px] px-[10px] rounded-[5px] text-white w-fit ml-auto text-[13px]"
                   }

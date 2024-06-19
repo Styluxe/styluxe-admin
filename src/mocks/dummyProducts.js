@@ -70,6 +70,30 @@ export const dummyImageHeading = [
   },
 ];
 
+export const ReferenceHeading = [
+  {
+    id: "image_url",
+    label: "Images",
+  },
+  {
+    id: "model_height",
+    label: "Model Height",
+  },
+  {
+    id: "model_weight",
+    label: "Model Weight",
+  },
+  {
+    id: "product_size",
+    label: "Product Size",
+  },
+  {
+    id: "action",
+    label: "Action",
+    width: "5%",
+  },
+];
+
 export const dummyMaterialDropdown = [
   {
     id: 1,

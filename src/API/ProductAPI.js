@@ -72,8 +72,22 @@ const useCreateProductApi = () => {
             return imageUrl;
           }),
         );
-
         data = { ...data, images: imageUrls };
+      }
+
+      if (data?.reference?.length > 0) {
+        const referenceUrls = await Promise.all(
+          data.reference.map(async (references) => {
+            const referenceUrl = await uploadImageToCloudinary(
+              references.image_url,
+            );
+            return {
+              ...references,
+              image_url: referenceUrl,
+            };
+          }),
+        );
+        data = { ...data, reference: referenceUrls };
       }
 
       const response = await axios.post(`${PATH_URL}/admin/product`, data, {

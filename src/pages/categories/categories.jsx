@@ -80,9 +80,9 @@ const CategoriesPage = () => {
             <TrashIcon
               className="bg-primary p-[3px] rounded-md  cursor-pointer w-[32px] h-[32px]  text-white"
               onClick={() => {
-                if (data.sub_categories.length > 0) {
+                if (data.sub_categories.length > 1) {
                   alert(
-                    "Category cannot be deleted because it has sub-categories",
+                    "Category cannot be deleted because it has more than 1 sub-categories",
                   );
                 } else {
                   setModalType("delete_category");
@@ -169,11 +169,11 @@ const CategoriesPage = () => {
           <p className="text-[20px] text-center">
             Do you want to delete this category?
           </p>
-          <div className="flex gap-[30px]">
+          <div className="flex gap-[30px] w-full">
             <Button
               text={"Yes"}
               classname={
-                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white"
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-full text-white"
               }
               onClick={() => {
                 removeCategory(selectedCategory);
@@ -182,7 +182,7 @@ const CategoriesPage = () => {
             <Button
               text={"No"}
               classname={
-                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-primary"
+                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-full text-primary"
               }
               onClick={() => {
                 setModalType(null);

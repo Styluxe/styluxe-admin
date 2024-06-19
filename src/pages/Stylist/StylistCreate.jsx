@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { SideBar } from "../../components/organisms/SideBar";
 import { Navbar } from "../../components/molecules/NavBar";
 import { InputLabel } from "../../components/molecules/InputLabel";
@@ -6,11 +6,14 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useAssignStylistApi, useGetnonStylistApi } from "../../API/StylistAPI";
 import { Button } from "../../components/atoms/Button";
 import { useNavigate } from "react-router-dom";
+import { debounce } from "lodash";
 
 const StylistCreate = () => {
   const { getNonStylist, nonStylists } = useGetnonStylistApi();
   const [selectedNonStylist, setSelectedNonStylist] = useState(null);
   const { assignStylist, code, setCode } = useAssignStylistApi();
+  const [keyword, setKeyword] = useState("");
+  const [emailInvalid, setEmailInvalid] = useState(false);
   const [newData, setNewData] = useState({
     first_name: "",
     last_name: "",
@@ -33,8 +36,8 @@ const StylistCreate = () => {
     newData?.mobile !== "";
 
   useEffect(() => {
-    getNonStylist();
-  }, []);
+    getNonStylist(keyword);
+  }, [keyword]);
 
   useEffect(() => {
     if (code === 201) {
@@ -65,6 +68,9 @@ const StylistCreate = () => {
     assignStylist(req_data);
   };
 
+  // Debounce function for setting keyword
+  const debounceSetKeyword = useCallback(debounce(setKeyword, 500), []);
+
   return (
     <div className="flex">
       <div className="h-screen">
@@ -90,6 +96,9 @@ const StylistCreate = () => {
                 )}
                 onChange={(event, newValue) => {
                   setSelectedNonStylist(newValue);
+                }}
+                onInputChange={(event, newInputValue) => {
+                  debounceSetKeyword(newInputValue);
                 }}
               />
             </div>
@@ -127,20 +136,27 @@ const StylistCreate = () => {
                   }
                   value={newData.last_name}
                 />
-                <InputLabel
-                  inputClassName={
-                    "border-[1px] border-gray-400 p-[3px] rounded-[5px] w-full"
-                  }
-                  label={"Email Address"}
-                  name={"email"}
-                  placeholder={"Enter Email Address"}
-                  labelPosition="top"
-                  disabled={selectedNonStylist ? true : false}
-                  onChange={(e) =>
-                    setNewData({ ...newData, email: e.target.value })
-                  }
-                  value={newData.email}
-                />
+                <div className="flex-col gap-1">
+                  <InputLabel
+                    inputClassName={
+                      "border-[1px] border-gray-400 p-[3px] rounded-[5px] w-full"
+                    }
+                    label={"Email Address"}
+                    name={"email"}
+                    placeholder={"Enter Email Address"}
+                    labelPosition="top"
+                    disabled={selectedNonStylist ? true : false}
+                    onChange={(e) => {
+                      const email = e.target.value;
+                      setNewData({ ...newData, email });
+                      setEmailInvalid(!email.includes("@"));
+                    }}
+                    value={newData.email}
+                  />
+                  {emailInvalid && (
+                    <p className="text-red-500">Please input valid email</p>
+                  )}
+                </div>
                 <InputLabel
                   inputClassName={
                     "border-[1px] border-gray-400 p-[3px] rounded-[5px] w-full"
@@ -150,9 +166,11 @@ const StylistCreate = () => {
                   placeholder={"Enter Mobile Number"}
                   labelPosition="top"
                   disabled={selectedNonStylist ? true : false}
-                  onChange={(e) =>
-                    setNewData({ ...newData, mobile: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, "");
+
+                    setNewData({ ...newData, mobile: value });
+                  }}
                   value={newData.mobile}
                 />
               </div>
