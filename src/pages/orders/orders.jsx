@@ -83,10 +83,11 @@ const OrdersPage = () => {
     return tableData?.map((data) => {
       return {
         ...data,
-        payment_receipt: data.payment_details?.payment_receipt ? (
+        payment_receipt: data.payment_details?.payment_receipt_url ? (
           <img
-            src={data.payment_details?.payment_receipt}
+            src={data.payment_details?.payment_receipt_url}
             alt="Payment Receipt"
+            className="w-[100px] h-[100px] object-cover"
           />
         ) : (
           <p className="text-[13px]">No Receipt</p>

@@ -7,6 +7,7 @@ import { useAssignStylistApi, useGetnonStylistApi } from "../../API/StylistAPI";
 import { Button } from "../../components/atoms/Button";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
+import { Modal } from "../../components/molecules/Modal";
 
 const StylistCreate = () => {
   const { getNonStylist, nonStylists } = useGetnonStylistApi();
@@ -14,6 +15,7 @@ const StylistCreate = () => {
   const { assignStylist, code, setCode } = useAssignStylistApi();
   const [keyword, setKeyword] = useState("");
   const [emailInvalid, setEmailInvalid] = useState(false);
+  const [modalType, setModalType] = useState(null);
   const [newData, setNewData] = useState({
     first_name: "",
     last_name: "",
@@ -55,6 +57,10 @@ const StylistCreate = () => {
       };
     });
   }, [nonStylists]);
+
+  const onClickAssign = () => {
+    setModalType("assign_stylist");
+  };
 
   const onAssign = () => {
     const req_data = {
@@ -184,11 +190,39 @@ const StylistCreate = () => {
               classname={`${
                 !isValid && !selectedNonStylist ? "bg-gray-400" : "bg-primary"
               } py-[5px] px-[10px] rounded-[5px] mt-[15px] w-fit text-white `}
-              onClick={onAssign}
+              onClick={onClickAssign}
             />
           </div>
         </div>
       </div>
+      <Modal
+        type="assign_stylist"
+        isOpen={modalType === "assign_stylist"}
+        onClose={() => setModalType(null)}
+      >
+        <div className="flex flex-col items-center justify-center w-full gap-y-[15px]">
+          <p className="text-[20px] font-bold">Confirmation</p>
+          <p className="text-[20px] text-center">
+            Do you want to assign this person?
+          </p>
+          <div className="flex gap-[30px] w-full">
+            <Button
+              text={"Yes"}
+              classname={
+                "bg-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-full text-white"
+              }
+              onClick={onAssign}
+            />
+            <Button
+              text={"No"}
+              classname={
+                "bg-white border-2 border-primary py-[5px] px-[10px] rounded-[5px] mt-[15px] w-full text-primary"
+              }
+              onClick={() => setModalType(null)}
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

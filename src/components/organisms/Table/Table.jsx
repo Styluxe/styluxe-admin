@@ -15,19 +15,30 @@ const Table = ({ headings, data, classname }) => {
         </tr>
       </thead>
       <tbody>
-        {data.map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {headings.map((heading, headingIndex) => (
-              <td key={headingIndex} className="border border-black p-2">
-                {typeof row[heading.id] === "string" ? (
-                  <p className="!text-[13px]">{row[heading.id]}</p>
-                ) : (
-                  row[heading.id]
-                )}
-              </td>
-            ))}
+        {data.length === 0 ? (
+          <tr>
+            <td
+              colSpan={headings.length}
+              className="border border-black p-2 text-center"
+            >
+              No data
+            </td>
           </tr>
-        ))}
+        ) : (
+          data.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {headings.map((heading, headingIndex) => (
+                <td key={headingIndex} className="border border-black p-2">
+                  {typeof row[heading.id] === "string" ? (
+                    <p className="!text-[13px]">{row[heading.id]}</p>
+                  ) : (
+                    row[heading.id]
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))
+        )}
       </tbody>
     </table>
   );

@@ -7,7 +7,10 @@ const useGetProductApi = () => {
   const [products, setProducts] = useState([]);
   const [code, setCode] = useState(null);
   const header = useAuthHeader();
+  const [loading, setLoading] = useState(false);
+
   const getProduct = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(`${PATH_URL}/admin/products`, {
         headers: {
@@ -18,8 +21,10 @@ const useGetProductApi = () => {
       setProducts(data);
       setCode(code);
       console.log("fetching product");
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
   return {
@@ -27,6 +32,7 @@ const useGetProductApi = () => {
     products,
     code,
     setCode,
+    loading,
   };
 };
 

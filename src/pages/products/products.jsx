@@ -21,7 +21,7 @@ const ProductsPage = () => {
   const navigate = useNavigate();
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const { getProduct, products } = useGetProductApi();
+  const { getProduct, products, loading } = useGetProductApi();
   const { removeProduct, code, setCode } = useRemoveProductApi();
 
   useEffect(() => {
@@ -145,11 +145,20 @@ const ProductsPage = () => {
               onPageChange={onPageChange}
             />
           </div>
-          <Table
-            headings={heading}
-            data={currentItems}
-            classname={"mt-[20px] rounded-[5px]"}
-          />
+          {loading ? (
+            <div>
+              <svg
+                className="animate-spin h-5 w-5 mr-3 ..."
+                viewBox="0 0 24 24"
+              ></svg>
+            </div>
+          ) : (
+            <Table
+              headings={heading}
+              data={currentItems}
+              classname={"mt-[20px] rounded-[5px]"}
+            />
+          )}
         </div>
       </div>
       <Modal

@@ -8,16 +8,10 @@ import { Table } from "../../components/organisms/Table";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useGetStylistApi } from "../../API/StylistAPI";
-import {
-  ArchiveBoxXMarkIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from "@heroicons/react/16/solid";
 import { IoPersonRemoveSharp } from "react-icons/io5";
 
 const Stylist = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [tableData, setTableData] = useState();
   const [modalType, setModalType] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
