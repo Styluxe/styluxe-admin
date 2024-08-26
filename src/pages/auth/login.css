@@ -1,3 +1,15 @@
 .loginHeader {
-    background-image: linear-gradient(to right, #613e07, #79520b, #91680f, #a97e14, #c09618);
+  background-image: linear-gradient(
+    to right,
+    #613e07,
+    #79520b,
+    #97704f,
+    #a97e14,
+    #c09618
+  );
+}
+
+.login_bg {
+  background-color: #e2c9be;
+  background-image: linear-gradient(315deg, #e2c9be 0%, #fbf7e9 74%);
 }
